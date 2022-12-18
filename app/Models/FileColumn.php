@@ -17,7 +17,7 @@ class FileColumn extends Model
     ];
 
     public function excelFileData(){
-        return $this->hasMany(ExcelFileData::class);
+        return $this->hasMany(ExcelFileData::class, 'column_id');
      }
 
      public function file(){

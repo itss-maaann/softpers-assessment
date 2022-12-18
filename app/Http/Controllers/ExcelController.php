@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Exports\ExportExcelFileData;
-use App\Http\Requests\ExcelRequest;
-use App\Imports\ImportExcelFileData;
 use App\Models\File;
 use App\Models\FileColumn;
 use Illuminate\Http\Request;
+use App\Http\Requests\ExcelRequest;
+use App\Exports\ExportExcelFileData;
+use App\Imports\ImportExcelFileData;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Cache;
 use Maatwebsite\Excel\HeadingRowImport;
 
 class ExcelController extends Controller
@@ -42,78 +43,19 @@ class ExcelController extends Controller
             ]);
         }
         Excel::import(new ImportExcelFileData, $request->file);
+        Cache::pull('columns');
         return redirect()->back()->with('success', 'Import has been started...!!');
+    }
+
+    public function viewFile(File $file){
+        $data['file_name'] = $file->name;
+        $data['headings'] = $file->columns->toArray();
+        $data['cells'] = $file->excelFiles()->orderBy('id', 'asc')->orderBy('column_id', 'asc')->get()->toArray();
+        return view('pages.view-file', $data);
     }
 
     public function exportFile(File $file)
     {
         return Excel::download(new ExportExcelFileData($file), $file->name);
-
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
     }
 }

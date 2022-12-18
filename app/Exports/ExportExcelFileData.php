@@ -12,7 +12,7 @@ use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithChunkReading;
 use Maatwebsite\Excel\Concerns\WithCustomQuerySize;
 
-class ExportExcelFileData implements FromCollection, WithHeadings, WithChunkReading, ShouldQueue
+class ExportExcelFileData implements FromCollection, WithHeadings, ShouldQueue
 {
     use Exportable;
     protected $file;
@@ -27,7 +27,6 @@ class ExportExcelFileData implements FromCollection, WithHeadings, WithChunkRead
     {
         $export_file = DB::table('excel_file_data')
         ->leftJoin('file_columns', 'excel_file_data.column_id', '=', 'file_columns.id')
-        ->leftJoin('files', 'file_columns.file_id', '=', 'files.id')
         ->where('file_columns.file_id', $this->file->id)
         ->select('file_columns.column_name','excel_file_data.*')
         ->get('column_id')
@@ -47,16 +46,6 @@ class ExportExcelFileData implements FromCollection, WithHeadings, WithChunkRead
     }
     public function headings(): array
     {
-        $headings = FileColumn::where('file_id', $this->file->id)->pluck('column_name')->toArray();
-        return [$headings];
-    }
-    public function batchSize(): int
-    {
-        return 500;
-    }
-
-    public function chunkSize(): int
-    {
-        return 500;
+        return $this->file->columns()->pluck('column_name')->toArray();
     }
 }

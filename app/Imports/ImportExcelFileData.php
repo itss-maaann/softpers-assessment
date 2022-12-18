@@ -5,6 +5,7 @@ namespace App\Imports;
 use App\Models\File;
 use App\Models\FileColumn;
 use App\Models\ExcelFileData;
+use Illuminate\Support\Facades\Cache;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Maatwebsite\Excel\Concerns\WithStartRow;
@@ -19,7 +20,9 @@ class ImportExcelFileData implements ToModel, WithChunkReading, ShouldQueue, Wit
      */
     public function model(array $row)
     {
-        $get_columns = FileColumn::where('file_id', File::orderBy('id', 'desc')->first()->id)->get()->modelKeys();
+        $get_columns = Cache::remember('columns', 15, function () {
+            return FileColumn::where('file_id', File::orderBy('id', 'desc')->first()->id)->get()->modelKeys();
+        });
         for ($i = 0; $i < count($get_columns); $i++) {
             ExcelFileData::create([
                 'column_id' => (int) $get_columns[$i],

@@ -21,6 +21,10 @@ class File extends Model
      }
 
      public function excelFiles(){
-        return $this->hasManyThrough(ExcelFileData::class, FileColumn::class);
+        return $this->hasManyThrough(ExcelFileData::class, FileColumn::class, 'file_id', 'column_id', 'id', 'id');
+      }
+
+      public function scopeRow($query,$row){
+        return $query->take(count($this->columns));
       }
 }

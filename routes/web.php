@@ -19,11 +19,12 @@ Route::get('/', function () {
 
 Route::prefix('file')->group(function () {
     Route::name('file.')->group(function () {
-        Route::resource('/', ExcelController::class);
         Route::controller(ExcelController::class)->group(function () {
+            Route::get('/', 'index')->name('index');
             Route::get('/import-files', 'importView')->name('importView');
             Route::post('/import', 'import')->name('import');
             Route::get('/export-file/{file}', 'exportFile')->name('export-file');
+            Route::get('/view-file/{file}', 'viewFile')->name('viewFile');
         });
     });
 });

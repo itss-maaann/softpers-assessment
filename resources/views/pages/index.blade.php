@@ -10,6 +10,7 @@
                     <th scope="col">Sr No</th>
                     <th scope="col">Name</th>
                     <th scope="col">Upload Time</th>
+                    <th scope="col">View File</th>
                     <th scope="col">Export File</th>
                 </tr>
             </thead>
@@ -19,6 +20,10 @@
                         <th scope="row">{{ ++$i }}</th>
                         <td>{{ $file->name }}</td>
                         <td>{{ $file->created_at }}</td>
+                        <td>
+                            <a href="{{ route('file.viewFile', ['file' => $file->id]) }}"><button type="button"
+                                    class="btn btn-primary">View</button></a>
+                        </td>
                         <td>
                             <a href="{{ route('file.export-file', ['file' => $file->id]) }}"><button type="button"
                                     class="btn btn-primary">Download</button></a>
